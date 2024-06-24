@@ -1,0 +1,111 @@
+﻿@page
+@model Miniblog.Pages.Admin.Blogs.AddModel
+@{
+}
+
+<div class="bg-secondary bg-opacity-10 py-2 mb-5">
+    <div class="container">
+        <h1>Dodaj post</h1>
+    </div>
+</div>
+
+<div>
+    <div class="container">
+        <form method="post">
+
+            <div class="mb-3">
+                <label for="heading" class="form-label">Nagłówek</label>
+                <input type="text" class="form-control" id="heading" asp-for="AddBlogPostRequest.Heading">
+            </div>
+
+            <div class="mb-3">
+                <label for="pageTitle" class="form-label">Tytuł</label>
+                <input type="text" class="form-control" id="pageTitle" asp-for="AddBlogPostRequest.PageTitle">
+            </div>
+
+            <div class="mb-3">
+                <label for="content" class="form-label">Zawartość</label>
+                <textarea class="form-control" id="content" asp-for="AddBlogPostRequest.Content"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="shortDescription" class="form-label">Krótki opis</label>
+                <input type="text" class="form-control" id="shortDescription" asp-for="AddBlogPostRequest.ShortDescription">
+            </div>
+
+            <div class="mb-3">
+                <label for="featuredImageUpload" class="form-label">Wgraj miniaturkę z dysku</label>
+                <input type="file" id="featuredImageUpload" asp-for="FeaturedImage"/>
+                <img src="" id="featuredImageDisplay" style="display:none; width:300px;"  />
+            </div>
+
+            <div class="mb-3">
+                <label for="featuredImageUrl" class="form-label">Miniaturka</label>
+                <input type="text" class="form-control" id="featuredImageUrl" asp-for="AddBlogPostRequest.FeaturedImageUrl">
+            </div>
+
+            <div class="mb-3">
+                <label for="urlHandle" class="form-label">Adres postu</label>
+                <input type="text" class="form-control" id="urlHandle" asp-for="AddBlogPostRequest.UrlHandle">
+            </div>
+
+            <div class="mb-3">
+                <label for="publishedDate" class="form-label">Data publikacji</label>
+                <input type="date" class="form-control" id="publishedDate" asp-for="AddBlogPostRequest.PublishedDate">
+            </div>
+
+            <div class="mb-3">
+                <label for="author" class="form-label">Autor</label>
+                <input type="text" class="form-control" id="author" asp-for="AddBlogPostRequest.Author">
+            </div>
+
+            <div class="mb-3">
+                <label for="author" class="form-label">Tagi (oddzielone przecinkami)</label>
+                <input type="text" class="form-control" id="tags" asp-for="Tags"/>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="isVisable" asp-for="AddBlogPostRequest.Visible">
+                <label class="form-check-label" for="isVisable">
+                    Widoczny
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-primary" type="submit">Dodaj</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const editor = new FroalaEditor('#content', {
+            imageUploadURL: '/api/images'
+        });
+
+        const featuredImageUploadElement = document.getElementById('featuredImageUpload');
+        const featuredImageUrl = document.getElementById('featuredImageUrl');
+        const featuredImageDisplay = document.getElementById('featuredImageDisplay');
+
+        async function uploadFeaturedImage(e) {
+            let data = new FormData();
+            data.append('file', e.target.files[0]);
+            await fetch('/api/images', {
+                method: 'POST',
+                headers: {
+                    'Accept': '*/*',
+                },
+                body: data
+            }).then(response => response.json())
+                .then(result => {
+                    featuredImageUrl.value = result.link;
+                    featuredImageDisplay.style.display = 'block';
+                    featuredImageDisplay.src = result.link;
+                });
+        }
+
+        featuredImageUploadElement.addEventListener('change', uploadFeaturedImage);
+    </script>
+    }
